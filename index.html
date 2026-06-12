@@ -4,43 +4,33 @@
 <meta charset="UTF-8">
 <title>Lime Empire</title>
 <style>
-body {
-    margin: 0;
-    background: #111;
-    color: white;
-    text-align: center;
-    font-family: Arial;
+body{
+    background:#111;
+    color:white;
+    text-align:center;
+    font-family:Arial;
 }
-
-#coin {
-    font-size: 120px;
-    cursor: pointer;
-    margin-top: 100px;
-}
-
-#score {
-    font-size: 30px;
+#lemon{
+    font-size:120px;
+    cursor:pointer;
 }
 </style>
 </head>
-
 <body>
 
 <h1>🍋 Lime Empire</h1>
 
-<div id="score">0</div>
+<h2 id="coins">0</h2>
 
-<div id="coin" onclick="tap()">🍋</div>
+<div id="lemon">🍋</div>
 
 <script>
+let coins = 0;
 
-let score = 0;
-
-function tap(){
-    score++;
-    document.getElementById("score").innerText = score;
+document.getElementById("lemon").onclick = function(){
+    coins++;
+    document.getElementById("coins").innerText = coins;
 }
-
 </script>
 
 </body>
