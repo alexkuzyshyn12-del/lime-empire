@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire</title>
+<title>Lime Empire PRO</title>
 
 <style>
 body {
@@ -12,24 +12,18 @@ body {
     text-align: center;
 }
 
-/* TOP */
-h1 {
-    margin: 10px;
-}
+h1 { margin: 10px; }
 
-/* BALANCE */
 #balance {
     font-size: 40px;
     font-weight: bold;
 }
 
-/* LEVEL */
 #level {
     font-size: 18px;
     margin-bottom: 10px;
 }
 
-/* LIME */
 .center {
     display: flex;
     justify-content: center;
@@ -39,14 +33,13 @@ h1 {
 #lime {
     width: 180px;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: 0.1s;
 }
 
 #lime:active {
     transform: scale(0.9);
 }
 
-/* SHOP */
 .shop {
     margin-top: 30px;
 }
@@ -66,8 +59,8 @@ button {
     border: none;
     border-radius: 8px;
     background: #ffcc00;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
 }
 
 button:active {
@@ -78,7 +71,7 @@ button:active {
 
 <body>
 
-<h1>🍋 Lime Empire</h1>
+<h1>🍋 Lime Empire PRO</h1>
 
 <div id="balance">0</div>
 <div id="level">Level: 1</div>
@@ -93,14 +86,14 @@ button:active {
 
     <div class="card">
         <h3>⚡ Power Upgrade</h3>
-        <p>+1 per click</p>
-        <button onclick="buyPower()">Buy (10 coins)</button>
+        <p>+1 click power</p>
+        <button onclick="buyPower()">Buy (<span id="powerCost"></span>)</button>
     </div>
 
     <div class="card">
         <h3>🤖 Auto Click</h3>
         <p>+1 per second</p>
-        <button onclick="buyAuto()">Buy (25 coins)</button>
+        <button onclick="buyAuto()">Buy (<span id="autoCost"></span>)</button>
     </div>
 
 </div>
@@ -113,10 +106,21 @@ let power = Number(localStorage.getItem("power")) || 1;
 let auto = Number(localStorage.getItem("auto")) || 0;
 let level = Number(localStorage.getItem("level")) || 1;
 
+// ===== COSTS =====
+function getPowerCost() {
+    return 10 * power;
+}
+
+function getAutoCost() {
+    return 25 * (auto + 1);
+}
+
 // ===== UPDATE =====
 function update() {
     document.getElementById("balance").innerText = coins;
     document.getElementById("level").innerText = "Level: " + level;
+    document.getElementById("powerCost").innerText = getPowerCost();
+    document.getElementById("autoCost").innerText = getAutoCost();
 }
 
 // ===== SAVE =====
@@ -135,27 +139,29 @@ function clickLime() {
     checkLevel();
 }
 
-// ===== SHOP POWER =====
+// ===== BUY POWER =====
 function buyPower() {
-    if (coins >= 10) {
-        coins -= 10;
+    let cost = getPowerCost();
+    if (coins >= cost) {
+        coins -= cost;
         power += 1;
         save();
         update();
     }
 }
 
-// ===== SHOP AUTO =====
+// ===== BUY AUTO =====
 function buyAuto() {
-    if (coins >= 25) {
-        coins -= 25;
+    let cost = getAutoCost();
+    if (coins >= cost) {
+        coins -= cost;
         auto += 1;
         save();
         update();
     }
 }
 
-// ===== AUTO CLICK =====
+// ===== AUTO SYSTEM =====
 setInterval(() => {
     if (auto > 0) {
         coins += auto;
@@ -165,12 +171,14 @@ setInterval(() => {
     }
 }, 1000);
 
-// ===== LEVEL SYSTEM =====
+// ===== LEVEL SYSTEM (HARDER PROGRESSION) =====
 function checkLevel() {
-    let newLevel = Math.floor(coins / 100) + 1;
+    let newLevel = Math.floor(Math.sqrt(coins / 50)) + 1;
+
     if (newLevel !== level) {
         level = newLevel;
         save();
+        update();
     }
 }
 
