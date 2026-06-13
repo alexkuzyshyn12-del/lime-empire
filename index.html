@@ -6,43 +6,24 @@
 
 <style>
 body{
-    font-family:Arial;
-    text-align:center;
-    background:linear-gradient(180deg,#fff7cc,#ffe680);
-    margin:0;
+  font-family:Arial;
+  text-align:center;
+  background:#fff7cc;
 }
 
-h1{margin:10px;}
-#coins{font-size:40px;font-weight:bold;}
-
 .card{
-    background:white;
-    width:300px;
-    margin:10px auto;
-    padding:10px;
-    border-radius:12px;
+  width:320px;
+  margin:10px auto;
+  background:white;
+  padding:10px;
+  border-radius:10px;
 }
 
 button{
-    width:90%;
-    padding:10px;
-    margin:5px;
-    border:none;
-    background:#ffcc00;
-    font-weight:bold;
-    border-radius:8px;
+  width:90%;
+  padding:10px;
+  margin:5px;
 }
-
-.page{display:none;}
-.active{display:block;}
-
-.nav{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    display:flex;
-}
-.nav button{flex:1;}
 </style>
 </head>
 
@@ -51,42 +32,30 @@ button{
 <h1>🍋 Lime Empire</h1>
 
 <div class="card">
-<div id="coins">0</div>
-<div>⚡ Energy: <span id="energy">100</span></div>
+<h2>💰 Coins: <span id="coins">0</span></h2>
+<h3>⚡ Energy: <span id="energy">100</span></h3>
+<h3>🖱 Power: <span id="power">1</span></h3>
 </div>
 
-<!-- HOME -->
-<div id="home" class="page active">
 <button onclick="tap()">🍋 TAP</button>
+<button onclick="upgrade()">Upgrade Tap</button>
+
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+<div id="board">Loading...</div>
 </div>
 
-<!-- SHOP -->
-<div id="shop" class="page">
-<button onclick="upgradeTap()">Upgrade Tap</button>
-<button onclick="buyFactory()">Buy Factory</button>
-</div>
+<!-- ============================= -->
+<!-- 🔥 1. SERVER (FIREBASE) AREA -->
+<!-- ============================= -->
 
-<!-- REF -->
-<div id="ref" class="page">
-<p id="refcode"></p>
-</div>
-
-<!-- NAV -->
-<div class="nav">
-<button onclick="openPage('home')">Home</button>
-<button onclick="openPage('shop')">Shop</button>
-<button onclick="openPage('ref')">Ref</button>
-</div>
-
-<!-- =============================== -->
-<!-- 🔥 FIREBASE CONFIG PLACE BELOW -->
-<!-- =============================== -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 <script>
 
 /* ======================================================
-   🔥 ВСТАВ СЮДИ FIREBASE CONFIG (ТОВІ ДАНІ З CONSOLE)
+   🔥 ВСТАВ СЮДИ КОД СЕРВЕРА (Firebase config)
+   ⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️
 ====================================================== */
 
 const firebaseConfig = {
@@ -100,105 +69,131 @@ const firebaseConfig = {
 };
 
 /* ======================================================
-   НЕ ТРОГАЙ НИЖЧЕ (поки не вставиш config)
+   🔥 ПІСЛЯ ЦЬОГО КОДУ НІЧОГО НЕ МІНЯТИ
 ====================================================== */
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ===== USER =====
-let userId = localStorage.getItem("uid");
-if(!userId){
-    userId = "U"+Math.floor(Math.random()*999999);
-    localStorage.setItem("uid",userId);
+/* =========================
+   👤 USER ID
+========================= */
+
+let user = localStorage.getItem("uid");
+if(!user){
+  user = "U"+Math.floor(Math.random()*999999);
+  localStorage.setItem("uid",user);
 }
 
-// ===== DATA =====
+/* =========================
+   🎮 GAME DATA
+========================= */
+
 let coins = 0;
 let power = 1;
-let factories = 0;
 let energy = 100;
 
-// ===== TAP =====
+/* =========================
+   🍋 TAP
+========================= */
+
 function tap(){
-if(energy<=0) return;
-coins += power;
-energy--;
-save();
-update();
+  coins += power;
+  energy--;
+  save();
+  update();
 }
 
-// ===== UPGRADE TAP =====
-function upgradeTap(){
-if(coins >= 50*power){
-    coins -= 50*power;
+/* =========================
+   ⚙️ UPGRADE
+========================= */
+
+function upgrade(){
+  let cost = 50 * power;
+
+  if(coins >= cost){
+    coins -= cost;
     power++;
     save();
     update();
-}
-}
-
-// ===== BUY FACTORY =====
-function buyFactory(){
-if(coins >= 10000){
-    coins -= 10000;
-    factories++;
-    save();
-    update();
-}
+  }
 }
 
-// ===== ENERGY =====
-setInterval(()=>{
-if(energy<100) energy++;
-update();
-},1000);
+/* =========================
+   💾 SAVE TO SERVER
+========================= */
 
-// ===== INCOME =====
-setInterval(()=>{
-coins += factories * 50;
-save();
-update();
-},1000);
-
-// ===== SAVE ONLINE =====
 function save(){
-db.collection("players").doc(userId).set({
-    coins: coins,
-    power: power,
-    factories: factories
-});
+  db.collection("players").doc(user).set({
+    coins,
+    power,
+    energy
+  });
 }
 
-// ===== LOAD ONLINE =====
+/* =========================
+   📥 LOAD FROM SERVER
+========================= */
+
 async function load(){
-let doc = await db.collection("players").doc(userId).get();
+  let doc = await db.collection("players").doc(user).get();
 
-if(doc.exists){
+  if(doc.exists){
     let d = doc.data();
-    coins = d.coins;
-    power = d.power;
-    factories = d.factories;
-}
-update();
+    coins = d.coins || 0;
+    power = d.power || 1;
+    energy = d.energy || 100;
+  }
+
+  update();
 }
 
-// ===== UI =====
+/* =========================
+   🏆 LEADERBOARD (ONLINE)
+========================= */
+
+async function leaderboard(){
+  let snap = await db.collection("players")
+  .orderBy("coins","desc")
+  .limit(10)
+  .get();
+
+  let html = "";
+  let i = 1;
+
+  snap.forEach(doc=>{
+    html += `<p>${i}. ${doc.id} — ${doc.data().coins}</p>`;
+    i++;
+  });
+
+  document.getElementById("board").innerHTML = html;
+}
+
+/* =========================
+   🔁 AUTO SAVE + LB
+========================= */
+
+setInterval(()=>{
+  save();
+  leaderboard();
+},5000);
+
+/* =========================
+   📊 UPDATE UI
+========================= */
+
 function update(){
-document.getElementById("coins").innerText = coins;
-document.getElementById("energy").innerText = energy;
-document.getElementById("refcode").innerText =
-"https://t.me/YOUR_BOT?start="+userId;
+  document.getElementById("coins").innerText = coins;
+  document.getElementById("energy").innerText = energy;
+  document.getElementById("power").innerText = power;
 }
 
-// ===== NAV =====
-function openPage(p){
-document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-document.getElementById(p).classList.add("active");
-}
+/* =========================
+   🚀 START
+========================= */
 
-// START
 load();
+leaderboard();
 update();
 
 </script>
