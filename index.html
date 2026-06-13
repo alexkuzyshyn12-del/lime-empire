@@ -22,11 +22,6 @@ body {
     width: 180px;
     margin-top: 30px;
     cursor: pointer;
-    transition: 0.1s;
-}
-
-#lime:active {
-    transform: scale(0.95);
 }
 
 .shop {
@@ -36,7 +31,6 @@ body {
 button {
     padding: 10px;
     margin: 5px;
-    cursor: pointer;
 }
 </style>
 </head>
@@ -48,21 +42,20 @@ button {
 <div id="balance">0</div>
 
 <img id="lime"
-     src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
-     onclick="clickLime()">
+src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
+onclick="clickLime()">
 
 <div class="shop">
     <h2>🏪 Shop</h2>
-
-    <button onclick="buyUpgrade()">+1 Click (cost: 10)</button>
+    <button onclick="buyPower()">+1 Power (cost 10)</button>
 </div>
 
 <script>
 // ===== DATA =====
-let coins = Number(localStorage.getItem("coins") || 0);
-let power = Number(localStorage.getItem("power") || 1);
+let coins = Number(localStorage.getItem("coins")) || 0;
+let power = Number(localStorage.getItem("power")) || 1;
 
-// ===== UPDATE =====
+// ===== UI =====
 function update() {
     document.getElementById("balance").innerText = coins;
 }
@@ -76,18 +69,18 @@ function save() {
 // ===== CLICK =====
 function clickLime() {
     coins += power;
-    update();
     save();
+    update();
 }
 
 // ===== SHOP =====
-function buyUpgrade() {
+function buyPower() {
     if (coins >= 10) {
         coins -= 10;
         power += 1;
         save();
         update();
-        alert("Upgrade bought! +1 click power");
+        alert("Upgrade bought!");
     } else {
         alert("Not enough coins!");
     }
