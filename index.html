@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire Menu</title>
+<title>Lime Empire PRO MAX</title>
 
 <style>
 body {
@@ -12,60 +12,36 @@ body {
     text-align: center;
 }
 
-/* TOP */
-h1 {
-    margin: 10px;
+h1 { margin: 10px; }
+
+#balance {
+    font-size: 40px;
+    font-weight: bold;
 }
 
-/* BALANCE */
-#balance {
-    font-size: 35px;
-    font-weight: bold;
+#level {
+    font-size: 16px;
 }
 
 /* LIME */
 #lime {
-    width: 180px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 6px solid #ffcc00;
+    object-fit: cover;
     cursor: pointer;
     transition: 0.1s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 #lime:active {
-    transform: scale(0.9);
+    transform: scale(0.92);
 }
 
-/* SECTIONS */
-.page {
-    display: none;
-    padding: 10px;
-}
-
-.active {
-    display: block;
-}
-
-/* BOTTOM MENU */
-.nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    display: flex;
-    background: #fff;
-    border-top: 2px solid #ddd;
-}
-
-.nav button {
-    flex: 1;
-    padding: 15px;
-    border: none;
-    background: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.nav button:hover {
-    background: #f5f5f5;
-}
+/* PAGES */
+.page { display:none; padding:10px; }
+.active { display:block; }
 
 /* CARD */
 .card {
@@ -74,14 +50,30 @@ h1 {
     margin: 10px auto;
     padding: 15px;
     border-radius: 12px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
+/* NAV */
+.nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    background: white;
+    border-top: 1px solid #ddd;
+}
+
+.nav button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: white;
+    font-weight: bold;
+}
 button.action {
     width: 100%;
     padding: 10px;
-    border: none;
     background: #ffcc00;
+    border: none;
     border-radius: 8px;
     font-weight: bold;
 }
@@ -90,8 +82,10 @@ button.action {
 
 <body>
 
-<h1>🍋 Lime Empire</h1>
+<h1>🍋 Lime Empire PRO MAX</h1>
+
 <div id="balance">0</div>
+<div id="level">Level: 1</div>
 
 <!-- HOME -->
 <div id="home" class="page active">
@@ -103,88 +97,176 @@ button.action {
 <!-- SHOP -->
 <div id="shop" class="page">
 
-    <div class="card">
-        <h3>⚡ Power</h3>
-        <button class="action" onclick="buyPower()">Buy (10)</button>
-    </div>
+<div class="card">
+<h3>⚡ Power</h3>
+<button class="action" onclick="buyPower()">Buy (10)</button>
+</div>
 
-    <div class="card">
-        <h3>🏭 Factory</h3>
-        <button class="action" onclick="buyFactory()">Buy (20)</button>
-    </div>
+<div class="card">
+<h3>🏭 Factory</h3>
+<button class="action" onclick="buyFactory()">Buy (20)</button>
+</div>
+
+</div>
+
+<!-- REF -->
+<div id="ref" class="page">
+
+<div class="card">
+<h3>👥 Referral Code</h3>
+<p id="mycode"></p>
+<button onclick="copyCode()">Copy</button>
+<button onclick="useRef()">Enter code</button>
+</div>
 
 </div>
 
 <!-- LEADERBOARD -->
-<div id="leaderboard" class="page">
-    <h2>🏆 Leaderboard</h2>
-    <p>Coming soon...</p>
+<div id="lb" class="page">
+
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+<div id="board"></div>
 </div>
 
-<!-- REFERRAL -->
-<div id="ref" class="page">
-    <h2>👥 Referral System</h2>
-    <p>Invite friends and earn rewards!</p>
+</div>
+
+<!-- DAILY -->
+<div id="daily" class="page">
+
+<div class="card">
+<h3>🎁 Daily Bonus</h3>
+<button onclick="claimDaily()">Claim</button>
+<p id="dailyText"></p>
+</div>
+
 </div>
 
 <!-- NAV -->
 <div class="nav">
-    <button onclick="openPage('home')">Home</button>
-    <button onclick="openPage('shop')">Shop</button>
-    <button onclick="openPage('leaderboard')">Rank</button>
-    <button onclick="openPage('ref')">Ref</button>
+<button onclick="openPage('home')">Home</button>
+<button onclick="openPage('shop')">Shop</button>
+<button onclick="openPage('ref')">Ref</button>
+<button onclick="openPage('lb')">Rank</button>
+<button onclick="openPage('daily')">Daily</button>
 </div>
 
 <script>
 
-// DATA
-let coins = Number(localStorage.getItem("coins")) || 0;
-let power = Number(localStorage.getItem("power")) || 1;
-let factories = Number(localStorage.getItem("factories")) || 0;
+// ===== DATA =====
+let coins = +localStorage.getItem("coins") || 0;
+let power = +localStorage.getItem("power") || 1;
+let factories = +localStorage.getItem("factories") || 0;
+let level = +localStorage.getItem("level") || 1;
 
-// UPDATE
-function update() {
-    document.getElementById("balance").innerText = coins;
+// ===== REF =====
+let mycode = localStorage.getItem("mycode");
+if(!mycode){
+    mycode = "LIME-" + Math.floor(Math.random()*99999);
+    localStorage.setItem("mycode", mycode);
 }
 
-// SAVE
-function save() {
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("power", power);
-    localStorage.setItem("factories", factories);
+// ===== DAILY =====
+let lastDaily = +localStorage.getItem("daily") || 0;
+
+// ===== SAVE =====
+function save(){
+localStorage.setItem("coins", coins);
+localStorage.setItem("power", power);
+localStorage.setItem("factories", factories);
+localStorage.setItem("level", level);
 }
 
-// CLICK
-function clickLime() {
-    coins += power;
-    save();
-    update();
+// ===== UPDATE =====
+function update(){
+document.getElementById("balance").innerText = coins;
+document.getElementById("level").innerText = "Level: " + level;
+document.getElementById("mycode").innerText = mycode;
 }
 
-// SHOP
-function buyPower() {
-    if (coins >= 10) {
-        coins -= 10;
-        power++;
-        save();
-        update();
-    }
+// ===== CLICK =====
+function clickLime(){
+coins += power;
+save(); update();
+checkLevel();
 }
 
-function buyFactory() {
-    if (coins >= 20) {
-        coins -= 20;
-        factories++;
-        save();
-        update();
-    }
+// ===== SHOP =====
+function buyPower(){
+if(coins>=10){
+coins-=10; power++;
+save(); update();
+}
 }
 
-// NAVIGATION
-function openPage(page) {
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
+function buyFactory(){
+if(coins>=20){
+coins-=20; factories++;
+save(); update();
 }
+}
+
+// ===== LEVEL =====
+function checkLevel(){
+level = Math.floor(Math.pow(coins/100,0.6))+1;
+}
+
+// ===== REF =====
+function copyCode(){
+navigator.clipboard.writeText(mycode);
+alert("Copied!");
+}
+
+function useRef(){
+let c = prompt("Enter code:");
+if(!c || c==mycode) return;
+coins += 500;
+power += 1;
+save(); update();
+alert("+500 bonus!");
+}
+
+// ===== DAILY BONUS =====
+function claimDaily(){
+let now = Date.now();
+if(now - lastDaily < 86400000){
+document.getElementById("dailyText").innerText = "Already claimed today";
+return;
+}
+coins += 1000;
+lastDaily = now;
+localStorage.setItem("daily", lastDaily);
+save(); update();
+alert("Daily +1000!");
+}
+
+// ===== LEADERBOARD (LOCAL SIM) =====
+function loadBoard(){
+let fake = [
+{n:"Player1",c:1200},
+{n:"Player2",c:900},
+{n:"You",c:coins}
+];
+fake.sort((a,b)=>b.c-a.c);
+
+document.getElementById("board").innerHTML =
+fake.map(p=>`<p>${p.n} - ${p.c}</p>`).join("");
+}
+
+// ===== NAV =====
+function openPage(p){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+document.getElementById(p).classList.add("active");
+if(p=="lb") loadBoard();
+}
+
+// ===== LOOP =====
+setInterval(()=>{
+coins += factories;
+save();
+update();
+checkLevel();
+},1000);
 
 // START
 update();
