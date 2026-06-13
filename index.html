@@ -7,36 +7,37 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: linear-gradient(180deg, #fff7cc, #ffe680);
-    color: #222;
+    text-align: center;
 }
 
-/* TOP BAR */
-.top {
-    text-align: center;
-    padding: 15px;
-    font-size: 28px;
-    font-weight: bold;
+/* TOP */
+h1 {
+    margin: 10px;
 }
 
 /* BALANCE */
 #balance {
-    text-align: center;
     font-size: 40px;
-    margin-top: 10px;
     font-weight: bold;
 }
 
-/* LIME BUTTON */
+/* LEVEL */
+#level {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* LIME */
 .center {
     display: flex;
     justify-content: center;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 #lime {
-    width: 200px;
+    width: 180px;
     cursor: pointer;
     transition: transform 0.1s;
 }
@@ -47,94 +48,133 @@ body {
 
 /* SHOP */
 .shop {
-    margin-top: 40px;
-    padding: 20px;
+    margin-top: 30px;
 }
 
 .card {
     background: white;
+    width: 260px;
     margin: 10px auto;
     padding: 15px;
-    width: 250px;
     border-radius: 12px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
 button {
-    padding: 10px;
     width: 100%;
+    padding: 10px;
     border: none;
     border-radius: 8px;
     background: #ffcc00;
-    font-weight: bold;
     cursor: pointer;
+    font-weight: bold;
 }
 
 button:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 </style>
 </head>
 
 <body>
 
-<div class="top">🍋 LIME EMPIRE</div>
+<h1>🍋 Lime Empire</h1>
 
 <div id="balance">0</div>
+<div id="level">Level: 1</div>
 
 <div class="center">
     <img id="lime"
     src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
-    onclick="clickLime()"
-    style="width:200px; cursor:pointer;">
+    onclick="clickLime()">
 </div>
 
 <div class="shop">
+
     <div class="card">
-        <h3>⚡ Upgrade Power</h3>
+        <h3>⚡ Power Upgrade</h3>
         <p>+1 per click</p>
         <button onclick="buyPower()">Buy (10 coins)</button>
     </div>
+
+    <div class="card">
+        <h3>🤖 Auto Click</h3>
+        <p>+1 per second</p>
+        <button onclick="buyAuto()">Buy (25 coins)</button>
+    </div>
+
 </div>
 
 <script>
 
-// DATA
+// ===== DATA =====
 let coins = Number(localStorage.getItem("coins")) || 0;
 let power = Number(localStorage.getItem("power")) || 1;
+let auto = Number(localStorage.getItem("auto")) || 0;
+let level = Number(localStorage.getItem("level")) || 1;
 
-// UI
+// ===== UPDATE =====
 function update() {
     document.getElementById("balance").innerText = coins;
+    document.getElementById("level").innerText = "Level: " + level;
 }
 
-// SAVE
+// ===== SAVE =====
 function save() {
     localStorage.setItem("coins", coins);
     localStorage.setItem("power", power);
+    localStorage.setItem("auto", auto);
+    localStorage.setItem("level", level);
 }
 
-// CLICK
+// ===== CLICK =====
 function clickLime() {
     coins += power;
     save();
     update();
+    checkLevel();
 }
 
-// SHOP
+// ===== SHOP POWER =====
 function buyPower() {
     if (coins >= 10) {
         coins -= 10;
         power += 1;
         save();
         update();
-        alert("+1 Power!");
-    } else {
-        alert("Not enough coins!");
     }
 }
 
-// START
+// ===== SHOP AUTO =====
+function buyAuto() {
+    if (coins >= 25) {
+        coins -= 25;
+        auto += 1;
+        save();
+        update();
+    }
+}
+
+// ===== AUTO CLICK =====
+setInterval(() => {
+    if (auto > 0) {
+        coins += auto;
+        save();
+        update();
+        checkLevel();
+    }
+}, 1000);
+
+// ===== LEVEL SYSTEM =====
+function checkLevel() {
+    let newLevel = Math.floor(coins / 100) + 1;
+    if (newLevel !== level) {
+        level = newLevel;
+        save();
+    }
+}
+
+// ===== START =====
 update();
 
 </script>
