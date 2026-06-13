@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire PRO MAX</title>
+<title>Lime Empire</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial;
-    text-align: center;
     background: linear-gradient(180deg, #fff7cc, #ffe680);
+    text-align: center;
 }
 
-h1 { margin: 10px; }
+h1 { margin-top: 10px; }
 
 #balance {
     font-size: 40px;
@@ -21,6 +21,7 @@ h1 { margin: 10px; }
 
 #level {
     font-size: 18px;
+    margin-bottom: 10px;
 }
 
 .center {
@@ -59,20 +60,21 @@ button {
     border-radius: 8px;
     background: #ffcc00;
     font-weight: bold;
+    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🍋 Lime Empire PRO MAX</h1>
+<h1>🍋 Lime Empire</h1>
 
 <div id="balance">0</div>
 <div id="level">Level: 1</div>
 
 <div class="center">
     <img id="lime"
-    src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
+    src="https://i.imgur.com/8Qf6Y6U.png"
     onclick="clickLime()">
 </div>
 
@@ -84,23 +86,18 @@ button {
     </div>
 
     <div class="card">
-        <h3>🏭 Lemon Factory</h3>
+        <h3>🏭 Factory 1</h3>
         <button onclick="buyFactory('lemon')">Buy (20)</button>
     </div>
 
     <div class="card">
-        <h3>🏭 Juice Factory</h3>
+        <h3>🏭 Factory 2</h3>
         <button onclick="buyFactory('juice')">Buy (100)</button>
     </div>
 
     <div class="card">
-        <h3>🏭 Mega Factory</h3>
+        <h3>🏭 Factory 3</h3>
         <button onclick="buyFactory('mega')">Buy (400)</button>
-    </div>
-
-    <div class="card">
-        <h3>💰 Offline Reward</h3>
-        <button onclick="claimReward()">Claim</button>
     </div>
 
 </div>
@@ -119,9 +116,6 @@ let factories = {
 
 let level = Number(localStorage.getItem("level")) || 1;
 
-let lastTime = Number(localStorage.getItem("lastTime")) || Date.now();
-let pendingReward = Number(localStorage.getItem("pendingReward")) || 0;
-
 // ===== SAVE =====
 function save() {
     localStorage.setItem("coins", coins);
@@ -130,8 +124,6 @@ function save() {
     localStorage.setItem("juice", factories.juice);
     localStorage.setItem("mega", factories.mega);
     localStorage.setItem("level", level);
-    localStorage.setItem("lastTime", lastTime);
-    localStorage.setItem("pendingReward", pendingReward);
 }
 
 // ===== UPDATE =====
@@ -160,26 +152,23 @@ function buyPower() {
 
 // ===== FACTORIES =====
 function buyFactory(type) {
-    if (type === "lemon" && coins >= 20) {
+    if (type === 'lemon' && coins >= 20) {
         coins -= 20;
         factories.lemon++;
     }
-
-    if (type === "juice" && coins >= 100) {
+    if (type === 'juice' && coins >= 100) {
         coins -= 100;
         factories.juice++;
     }
-
-    if (type === "mega" && coins >= 400) {
+    if (type === 'mega' && coins >= 400) {
         coins -= 400;
         factories.mega++;
     }
-
     save();
     update();
 }
 
-// ===== PASSIVE INCOME =====
+// ===== INCOME =====
 setInterval(() => {
     coins += factories.lemon * 1;
     coins += factories.juice * 5;
@@ -190,46 +179,12 @@ setInterval(() => {
     checkLevel();
 }, 1000);
 
-// ===== LEVEL (HARD PROGRESSION) =====
+// ===== LEVEL =====
 function checkLevel() {
     level = Math.floor(Math.pow(coins / 100, 0.6)) + 1;
 }
 
-// ===== OFFLINE REWARD =====
-function calcOffline() {
-    let now = Date.now();
-    let diff = now - lastTime;
-
-    let max = 3 * 60 * 60 * 1000;
-    if (diff >= max) {
-        pendingReward =
-            factories.lemon * 3600 * 1 +
-            factories.juice * 3600 * 5 +
-            factories.mega * 3600 * 20;
-
-        pendingReward = Math.floor(pendingReward);
-    } else {
-        pendingReward = 0;
-    }
-}
-
-function claimReward() {
-    calcOffline();
-
-    if (pendingReward > 0) {
-        coins += pendingReward;
-        pendingReward = 0;
-        lastTime = Date.now();
-        save();
-        update();
-        alert("💰 Claimed reward!");
-    } else {
-        alert("❌ Nothing to claim or expired");
-    }
-}
-
 // ===== START =====
-calcOffline();
 update();
 
 </script>
