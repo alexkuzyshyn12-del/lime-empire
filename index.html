@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire PRO</title>
+<title>Lime Empire PRO MAX</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(180deg, #fff7cc, #ffe680);
     text-align: center;
+    background: linear-gradient(180deg, #fff7cc, #ffe680);
 }
 
 h1 { margin: 10px; }
@@ -21,7 +21,6 @@ h1 { margin: 10px; }
 
 #level {
     font-size: 18px;
-    margin-bottom: 10px;
 }
 
 .center {
@@ -41,12 +40,12 @@ h1 { margin: 10px; }
 }
 
 .shop {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .card {
     background: white;
-    width: 260px;
+    width: 280px;
     margin: 10px auto;
     padding: 15px;
     border-radius: 12px;
@@ -60,18 +59,13 @@ button {
     border-radius: 8px;
     background: #ffcc00;
     font-weight: bold;
-    cursor: pointer;
-}
-
-button:active {
-    transform: scale(0.97);
 }
 </style>
 </head>
 
 <body>
 
-<h1>🍋 Lime Empire PRO</h1>
+<h1>🍋 Lime Empire PRO MAX</h1>
 
 <div id="balance">0</div>
 <div id="level">Level: 1</div>
@@ -85,15 +79,28 @@ button:active {
 <div class="shop">
 
     <div class="card">
-        <h3>⚡ Power Upgrade</h3>
-        <p>+1 click power</p>
-        <button onclick="buyPower()">Buy (<span id="powerCost"></span>)</button>
+        <h3>⚡ Power</h3>
+        <button onclick="buyPower()">Buy (10)</button>
     </div>
 
     <div class="card">
-        <h3>🤖 Auto Click</h3>
-        <p>+1 per second</p>
-        <button onclick="buyAuto()">Buy (<span id="autoCost"></span>)</button>
+        <h3>🏭 Lemon Factory</h3>
+        <button onclick="buyFactory('lemon')">Buy (20)</button>
+    </div>
+
+    <div class="card">
+        <h3>🏭 Juice Factory</h3>
+        <button onclick="buyFactory('juice')">Buy (100)</button>
+    </div>
+
+    <div class="card">
+        <h3>🏭 Mega Factory</h3>
+        <button onclick="buyFactory('mega')">Buy (400)</button>
+    </div>
+
+    <div class="card">
+        <h3>💰 Offline Reward</h3>
+        <button onclick="claimReward()">Claim</button>
     </div>
 
 </div>
@@ -103,32 +110,34 @@ button:active {
 // ===== DATA =====
 let coins = Number(localStorage.getItem("coins")) || 0;
 let power = Number(localStorage.getItem("power")) || 1;
-let auto = Number(localStorage.getItem("auto")) || 0;
+
+let factories = {
+    lemon: Number(localStorage.getItem("lemon")) || 0,
+    juice: Number(localStorage.getItem("juice")) || 0,
+    mega: Number(localStorage.getItem("mega")) || 0
+};
+
 let level = Number(localStorage.getItem("level")) || 1;
 
-// ===== COSTS =====
-function getPowerCost() {
-    return 10 * power;
-}
+let lastTime = Number(localStorage.getItem("lastTime")) || Date.now();
+let pendingReward = Number(localStorage.getItem("pendingReward")) || 0;
 
-function getAutoCost() {
-    return 25 * (auto + 1);
+// ===== SAVE =====
+function save() {
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("power", power);
+    localStorage.setItem("lemon", factories.lemon);
+    localStorage.setItem("juice", factories.juice);
+    localStorage.setItem("mega", factories.mega);
+    localStorage.setItem("level", level);
+    localStorage.setItem("lastTime", lastTime);
+    localStorage.setItem("pendingReward", pendingReward);
 }
 
 // ===== UPDATE =====
 function update() {
     document.getElementById("balance").innerText = coins;
     document.getElementById("level").innerText = "Level: " + level;
-    document.getElementById("powerCost").innerText = getPowerCost();
-    document.getElementById("autoCost").innerText = getAutoCost();
-}
-
-// ===== SAVE =====
-function save() {
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("power", power);
-    localStorage.setItem("auto", auto);
-    localStorage.setItem("level", level);
 }
 
 // ===== CLICK =====
@@ -139,50 +148,88 @@ function clickLime() {
     checkLevel();
 }
 
-// ===== BUY POWER =====
+// ===== POWER =====
 function buyPower() {
-    let cost = getPowerCost();
-    if (coins >= cost) {
-        coins -= cost;
+    if (coins >= 10) {
+        coins -= 10;
         power += 1;
         save();
         update();
     }
 }
 
-// ===== BUY AUTO =====
-function buyAuto() {
-    let cost = getAutoCost();
-    if (coins >= cost) {
-        coins -= cost;
-        auto += 1;
-        save();
-        update();
+// ===== FACTORIES =====
+function buyFactory(type) {
+    if (type === "lemon" && coins >= 20) {
+        coins -= 20;
+        factories.lemon++;
+    }
+
+    if (type === "juice" && coins >= 100) {
+        coins -= 100;
+        factories.juice++;
+    }
+
+    if (type === "mega" && coins >= 400) {
+        coins -= 400;
+        factories.mega++;
+    }
+
+    save();
+    update();
+}
+
+// ===== PASSIVE INCOME =====
+setInterval(() => {
+    coins += factories.lemon * 1;
+    coins += factories.juice * 5;
+    coins += factories.mega * 20;
+
+    save();
+    update();
+    checkLevel();
+}, 1000);
+
+// ===== LEVEL (HARD PROGRESSION) =====
+function checkLevel() {
+    level = Math.floor(Math.pow(coins / 100, 0.6)) + 1;
+}
+
+// ===== OFFLINE REWARD =====
+function calcOffline() {
+    let now = Date.now();
+    let diff = now - lastTime;
+
+    let max = 3 * 60 * 60 * 1000;
+    if (diff >= max) {
+        pendingReward =
+            factories.lemon * 3600 * 1 +
+            factories.juice * 3600 * 5 +
+            factories.mega * 3600 * 20;
+
+        pendingReward = Math.floor(pendingReward);
+    } else {
+        pendingReward = 0;
     }
 }
 
-// ===== AUTO SYSTEM =====
-setInterval(() => {
-    if (auto > 0) {
-        coins += auto;
+function claimReward() {
+    calcOffline();
+
+    if (pendingReward > 0) {
+        coins += pendingReward;
+        pendingReward = 0;
+        lastTime = Date.now();
         save();
         update();
-        checkLevel();
-    }
-}, 1000);
-
-// ===== LEVEL SYSTEM (HARDER PROGRESSION) =====
-function checkLevel() {
-    let newLevel = Math.floor(Math.sqrt(coins / 50)) + 1;
-
-    if (newLevel !== level) {
-        level = newLevel;
-        save();
-        update();
+        alert("💰 Claimed reward!");
+    } else {
+        alert("❌ Nothing to claim or expired");
     }
 }
 
 // ===== START =====
+calcOffline();
 update();
 
 </script>
