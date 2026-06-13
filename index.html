@@ -1,36 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Lime Empire</title>
+
 <style>
-body{
-    background:#111;
-    color:white;
-    text-align:center;
-    font-family:Arial;
+body {
+    margin: 0;
+    font-family: Arial;
+    text-align: center;
+    background: #fff7cc;
 }
-#lemon{
-    font-size:120px;
-    cursor:pointer;
+
+#balance {
+    font-size: 40px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#lime {
+    width: 180px;
+    margin-top: 30px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+#lime:active {
+    transform: scale(0.95);
+}
+
+.shop {
+    margin-top: 30px;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
 }
 </style>
 </head>
+
 <body>
 
 <h1>🍋 Lime Empire</h1>
 
-<h2 id="coins">0</h2>
+<div id="balance">0</div>
 
-<div id="lemon">🍋</div>
+<img id="lime"
+     src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
+     onclick="clickLime()">
+
+<div class="shop">
+    <h2>🏪 Shop</h2>
+
+    <button onclick="buyUpgrade()">+1 Click (cost: 10)</button>
+</div>
 
 <script>
-let coins = 0;
+// ===== DATA =====
+let coins = Number(localStorage.getItem("coins") || 0);
+let power = Number(localStorage.getItem("power") || 1);
 
-document.getElementById("lemon").onclick = function(){
-    coins++;
-    document.getElementById("coins").innerText = coins;
+// ===== UPDATE =====
+function update() {
+    document.getElementById("balance").innerText = coins;
 }
+
+// ===== SAVE =====
+function save() {
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("power", power);
+}
+
+// ===== CLICK =====
+function clickLime() {
+    coins += power;
+    update();
+    save();
+}
+
+// ===== SHOP =====
+function buyUpgrade() {
+    if (coins >= 10) {
+        coins -= 10;
+        power += 1;
+        save();
+        update();
+        alert("Upgrade bought! +1 click power");
+    } else {
+        alert("Not enough coins!");
+    }
+}
+
+// ===== START =====
+update();
 </script>
 
 </body>
