@@ -7,87 +7,135 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial;
-    text-align: center;
-    background: #fff7cc;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #fff7cc, #ffe680);
+    color: #222;
 }
 
+/* TOP BAR */
+.top {
+    text-align: center;
+    padding: 15px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* BALANCE */
 #balance {
+    text-align: center;
     font-size: 40px;
     margin-top: 10px;
     font-weight: bold;
 }
 
-#lime {
-    width: 180px;
+/* LIME BUTTON */
+.center {
+    display: flex;
+    justify-content: center;
     margin-top: 30px;
-    cursor: pointer;
 }
 
+#lime {
+    width: 200px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+#lime:active {
+    transform: scale(0.9);
+}
+
+/* SHOP */
 .shop {
-    margin-top: 30px;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    margin: 10px auto;
+    padding: 15px;
+    width: 250px;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
 button {
     padding: 10px;
-    margin: 5px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background: #ffcc00;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 </style>
 </head>
 
 <body>
 
-<h1>🍋 Lime Empire</h1>
+<div class="top">🍋 LIME EMPIRE</div>
 
 <div id="balance">0</div>
 
-<img id="lime"
-src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
-onclick="clickLime()">
+<div class="center">
+    <img id="lime"
+    src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
+    onclick="clickLime()">
+</div>
 
 <div class="shop">
-    <h2>🏪 Shop</h2>
-    <button onclick="buyPower()">+1 Power (cost 10)</button>
+    <div class="card">
+        <h3>⚡ Upgrade Power</h3>
+        <p>+1 per click</p>
+        <button onclick="buyPower()">Buy (10 coins)</button>
+    </div>
 </div>
 
 <script>
-// ===== DATA =====
+
+// DATA
 let coins = Number(localStorage.getItem("coins")) || 0;
 let power = Number(localStorage.getItem("power")) || 1;
 
-// ===== UI =====
+// UI
 function update() {
     document.getElementById("balance").innerText = coins;
 }
 
-// ===== SAVE =====
+// SAVE
 function save() {
     localStorage.setItem("coins", coins);
     localStorage.setItem("power", power);
 }
 
-// ===== CLICK =====
+// CLICK
 function clickLime() {
     coins += power;
     save();
     update();
 }
 
-// ===== SHOP =====
+// SHOP
 function buyPower() {
     if (coins >= 10) {
         coins -= 10;
         power += 1;
         save();
         update();
-        alert("Upgrade bought!");
+        alert("+1 Power!");
     } else {
         alert("Not enough coins!");
     }
 }
 
-// ===== START =====
+// START
 update();
+
 </script>
 
 </body>
