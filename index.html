@@ -2,144 +2,103 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire PRO MAX</title>
+<title>Lime Empire Full</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: linear-gradient(180deg, #fff7cc, #ffe680);
-    text-align: center;
+body{
+    font-family:Arial;
+    text-align:center;
+    background:linear-gradient(180deg,#fff7cc,#ffe680);
+    margin:0;
 }
 
-h1 { margin: 10px; }
+h1{margin:10px;}
 
-#balance {
-    font-size: 40px;
-    font-weight: bold;
+#coins{font-size:40px;font-weight:bold;}
+#energy{color:green;}
+
+.card{
+    background:white;
+    width:300px;
+    margin:10px auto;
+    padding:10px;
+    border-radius:12px;
 }
 
-#level {
-    font-size: 16px;
+button{
+    width:90%;
+    padding:10px;
+    margin:5px;
+    border:none;
+    background:#ffcc00;
+    font-weight:bold;
+    border-radius:8px;
 }
 
-/* LIME */
-#lime {
-    width: 240px;
-    height: 240px;
-    border-radius: 50%;
-    border: 6px solid #ffcc00;
-    object-fit: cover;
-    cursor: pointer;
-    transition: 0.1s;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+.nav{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    display:flex;
 }
 
-#lime:active {
-    transform: scale(0.92);
-}
-
-/* PAGES */
-.page { display:none; padding:10px; }
-.active { display:block; }
-
-/* CARD */
-.card {
-    background: white;
-    width: 280px;
-    margin: 10px auto;
-    padding: 15px;
-    border-radius: 12px;
-}
-
-/* NAV */
-.nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    display: flex;
-    background: white;
-    border-top: 1px solid #ddd;
-}
-
-.nav button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: white;
-    font-weight: bold;
-}
-button.action {
-    width: 100%;
-    padding: 10px;
-    background: #ffcc00;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-}
+.nav button{flex:1;}
+.page{display:none;}
+.active{display:block;}
 </style>
 </head>
 
 <body>
 
-<h1>🍋 Lime Empire PRO MAX</h1>
+<h1>🍋 Lime Empire</h1>
 
-<div id="balance">0</div>
-<div id="level">Level: 1</div>
+<div class="card">
+<div id="coins">0</div>
+<div>⚡ Energy: <span id="energy">100</span></div>
+<div>🖱 Tap Power: <span id="power">1</span></div>
+</div>
 
 <!-- HOME -->
 <div id="home" class="page active">
-    <img id="lime"
-    src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
-    onclick="clickLime()">
+<button onclick="tap()">🍋 TAP</button>
 </div>
 
 <!-- SHOP -->
 <div id="shop" class="page">
 
 <div class="card">
-<h3>⚡ Power</h3>
-<button class="action" onclick="buyPower()">Buy (10)</button>
+<h3>🖱 Upgrade Tap</h3>
+<button onclick="upgradeTap()">Upgrade</button>
 </div>
 
 <div class="card">
-<h3>🏭 Factory</h3>
-<button class="action" onclick="buyFactory()">Buy (20)</button>
+<h3>🏭 Rubber Factory</h3>
+<button onclick="buy('rubber')">Buy</button>
+<p>Lvl: <span id="r1"></span></p>
+</div>
+
+<div class="card">
+<h3>🍹 Juice Factory</h3>
+<button onclick="buy('juice')">Buy</button>
+<p>Lvl: <span id="r2"></span></p>
 </div>
 
 </div>
 
 <!-- REF -->
 <div id="ref" class="page">
-
 <div class="card">
-<h3>👥 Referral Code</h3>
-<p id="mycode"></p>
-<button onclick="copyCode()">Copy</button>
-<button onclick="useRef()">Enter code</button>
+<h3>👥 Referral</h3>
+<p id="refcode"></p>
+</div>
 </div>
 
-</div>
-
-<!-- LEADERBOARD -->
+<!-- LB -->
 <div id="lb" class="page">
-
 <div class="card">
 <h3>🏆 Leaderboard</h3>
 <div id="board"></div>
 </div>
-
-</div>
-
-<!-- DAILY -->
-<div id="daily" class="page">
-
-<div class="card">
-<h3>🎁 Daily Bonus</h3>
-<button onclick="claimDaily()">Claim</button>
-<p id="dailyText"></p>
-</div>
-
 </div>
 
 <!-- NAV -->
@@ -148,127 +107,128 @@ button.action {
 <button onclick="openPage('shop')">Shop</button>
 <button onclick="openPage('ref')">Ref</button>
 <button onclick="openPage('lb')">Rank</button>
-<button onclick="openPage('daily')">Daily</button>
 </div>
 
 <script>
 
 // ===== DATA =====
-let coins = +localStorage.getItem("coins") || 0;
-let power = +localStorage.getItem("power") || 1;
-let factories = +localStorage.getItem("factories") || 0;
-let level = +localStorage.getItem("level") || 1;
+let coins = 0;
+let power = 1;
+let energy = 100;
 
-// ===== REF =====
-let mycode = localStorage.getItem("mycode");
-if(!mycode){
-    mycode = "LIME-" + Math.floor(Math.random()*99999);
-    localStorage.setItem("mycode", mycode);
+// factories
+let f = {
+    rubber:{c:0,lvl:1,base:60},
+    juice:{c:0,lvl:1,base:200}
+};
+
+// user
+let user = localStorage.getItem("uid");
+if(!user){
+    user = "U"+Math.floor(Math.random()*999999);
+    localStorage.setItem("uid",user);
 }
 
-// ===== DAILY =====
-let lastDaily = +localStorage.getItem("daily") || 0;
+// ===== TAP =====
+function tap(){
+if(energy<=0) return;
 
-// ===== SAVE =====
-function save(){
-localStorage.setItem("coins", coins);
-localStorage.setItem("power", power);
-localStorage.setItem("factories", factories);
-localStorage.setItem("level", level);
-}
-
-// ===== UPDATE =====
-function update(){
-document.getElementById("balance").innerText = coins;
-document.getElementById("level").innerText = "Level: " + level;
-document.getElementById("mycode").innerText = mycode;
-}
-
-// ===== CLICK =====
-function clickLime(){
 coins += power;
-save(); update();
-checkLevel();
+energy -= 1;
+
+save();
+update();
 }
 
-// ===== SHOP =====
-function buyPower(){
-if(coins>=10){
-coins-=10; power++;
-save(); update();
-}
-}
-
-function buyFactory(){
-if(coins>=20){
-coins-=20; factories++;
-save(); update();
+// ===== TAP UPGRADE =====
+function upgradeTap(){
+if(coins >= 50*power){
+    coins -= 50*power;
+    power++;
+    save();
+    update();
 }
 }
 
-// ===== LEVEL =====
-function checkLevel(){
-level = Math.floor(Math.pow(coins/100,0.6))+1;
+// ===== BUY FACTORY =====
+function buy(t){
+let cost = 10000 * f[t].lvl;
+
+if(coins >= cost){
+    coins -= cost;
+    f[t].lvl++;
+    save();
+    update();
+}
+}
+
+// ===== ENERGY =====
+setInterval(()=>{
+if(energy < 100) energy++;
+update();
+},1000);
+
+// ===== INCOME =====
+setInterval(()=>{
+coins += f.rubber.c * f.rubber.base * f.rubber.lvl;
+coins += f.juice.c * f.juice.base * f.juice.lvl;
+save();
+update();
+},1000);
+
+// ===== SAVE (LOCAL) =====
+function save(){
+localStorage.setItem("game",JSON.stringify({
+coins,power,energy,f
+}));
+}
+
+// ===== LOAD =====
+function load(){
+let g = JSON.parse(localStorage.getItem("game"));
+if(g){
+coins=g.coins;
+power=g.power;
+energy=g.energy;
+f=g.f;
+}
+update();
 }
 
 // ===== REF =====
-function copyCode(){
-navigator.clipboard.writeText(mycode);
-alert("Copied!");
+function ref(){
+document.getElementById("refcode").innerText =
+"https://t.me/YOUR_BOT?start="+user;
 }
 
-function useRef(){
-let c = prompt("Enter code:");
-if(!c || c==mycode) return;
-coins += 500;
-power += 1;
-save(); update();
-alert("+500 bonus!");
+// ===== LB =====
+function board(){
+document.getElementById("board").innerHTML=
+"<p>Online leaderboard needs Firebase</p>";
 }
 
-// ===== DAILY BONUS =====
-function claimDaily(){
-let now = Date.now();
-if(now - lastDaily < 86400000){
-document.getElementById("dailyText").innerText = "Already claimed today";
-return;
-}
-coins += 1000;
-lastDaily = now;
-localStorage.setItem("daily", lastDaily);
-save(); update();
-alert("Daily +1000!");
-}
+// ===== UI =====
+function update(){
+document.getElementById("coins").innerText = coins;
+document.getElementById("energy").innerText = energy;
+document.getElementById("power").innerText = power;
 
-// ===== LEADERBOARD (LOCAL SIM) =====
-function loadBoard(){
-let fake = [
-{n:"Player1",c:1200},
-{n:"Player2",c:900},
-{n:"You",c:coins}
-];
-fake.sort((a,b)=>b.c-a.c);
+document.getElementById("r1").innerText = f.rubber.lvl;
+document.getElementById("r2").innerText = f.juice.lvl;
 
-document.getElementById("board").innerHTML =
-fake.map(p=>`<p>${p.n} - ${p.c}</p>`).join("");
+ref();
 }
 
 // ===== NAV =====
 function openPage(p){
 document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
 document.getElementById(p).classList.add("active");
-if(p=="lb") loadBoard();
+
+if(p=="lb") board();
 }
 
-// ===== LOOP =====
-setInterval(()=>{
-coins += factories;
-save();
-update();
-checkLevel();
-},1000);
-
 // START
+load();
 update();
 
 </script>
