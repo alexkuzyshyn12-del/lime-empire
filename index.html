@@ -11,9 +11,10 @@
 <style>
 body{
     margin:0;
+    font-family:Arial;
     background:#f6e27a;
-    font-family:Arial,sans-serif;
     text-align:center;
+    padding-bottom:90px;
 }
 
 .top{
@@ -24,28 +25,23 @@ body{
 }
 
 #tapBtn{
-    width:280px;
-    height:280px;
+    width:270px;
+    height:270px;
     border-radius:50%;
     border:none;
-    font-size:120px;
+    font-size:110px;
     background:#ffd54f;
-    box-shadow:0 0 30px rgba(255,200,0,.6);
     margin-top:20px;
+    box-shadow:0 0 25px rgba(0,0,0,0.2);
 }
 
-.page{
-    display:none;
-}
-
-.active{
-    display:block;
-}
+.page{display:none;}
+.active{display:block;}
 
 .card{
     background:white;
     margin:10px;
-    padding:10px;
+    padding:12px;
     border-radius:12px;
 }
 
@@ -54,20 +50,14 @@ body{
     bottom:0;
     width:100%;
     display:flex;
+    background:white;
 }
 
 .bottomMenu button{
     flex:1;
     padding:15px;
     border:none;
-    background:white;
-    font-size:18px;
-}
-
-.factoryBtn{
-    width:90%;
-    padding:10px;
-    margin-top:10px;
+    font-size:16px;
 }
 </style>
 </head>
@@ -78,69 +68,58 @@ body{
 <h1>🍋 Lime Empire</h1>
 
 <h2>💰 <span id="coins">0</span></h2>
-
-<div>⚡ Energy: <span id="energy">100</span></div>
-<div>🖱 Tap Power: <span id="power">1</span></div>
-<div>💸 Income/hour: <span id="income">0</span></div>
+<p>⚡ Energy: <span id="energy">100</span></p>
+<p>🖱 Power: <span id="power">1</span></p>
+<p>💸 Income/hour: <span id="income">0</span></p>
 </div>
 
 <!-- HOME -->
 <div id="home" class="page active">
-
-<button id="tapBtn" onclick="tap()">
-🍋
-</button>
-
+<button id="tapBtn" onclick="tap()">🍋</button>
 </div>
 
 <!-- SHOP -->
 <div id="shop" class="page">
 
 <div class="card">
-<h3>🖱 Upgrade Tap</h3>
-<button class="factoryBtn" onclick="upgradeTap()">
-Upgrade
-</button>
+<h3>Upgrade Tap</h3>
+<button onclick="upgradeTap()">Upgrade</button>
+<p>Cost: <span id="tapCost">50</span></p>
 </div>
 
 <div class="card">
-<h3>🏭 Rubber Factory</h3>
-Level: <span id="rubberLvl">1</span><br>
-<button class="factoryBtn" onclick="buyFactory('rubber')">
-Upgrade
-</button>
+<h3>Rubber Factory</h3>
+Level: <span id="rubberLvl">1</span>
+<button onclick="buyFactory('rubber')">Upgrade</button>
+<p>Cost: <span id="rubberCost">10000</span></p>
 </div>
 
 <div class="card">
-<h3>🍹 Juice Factory</h3>
-Level: <span id="juiceLvl">1</span><br>
-<button class="factoryBtn" onclick="buyFactory('juice')">
-Upgrade
-</button>
+<h3>Juice Factory</h3>
+Level: <span id="juiceLvl">1</span>
+<button onclick="buyFactory('juice')">Upgrade</button>
+<p>Cost: <span id="juiceCost">10000</span></p>
 </div>
 
 <div class="card">
-<h3>🍋 Lime Farm</h3>
-Level: <span id="limeLvl">1</span><br>
-<button class="factoryBtn" onclick="buyFactory('lime')">
-Upgrade
-</button>
+<h3>Lime Farm</h3>
+Level: <span id="limeLvl">1</span>
+<button onclick="buyFactory('lime')">Upgrade</button>
+<p>Cost: <span id="limeCost">10000</span></p>
 </div>
 
 <div class="card">
-<h3>💧 Water Plant</h3>
-Level: <span id="waterLvl">1</span><br>
-<button class="factoryBtn" onclick="buyFactory('water')">
-Upgrade
-</button>
+<h3>Water Plant</h3>
+Level: <span id="waterLvl">1</span>
+<button onclick="buyFactory('water')">Upgrade</button>
+<p>Cost: <span id="waterCost">10000</span></p>
 </div>
 
 <div class="card">
-<h3>⚡ Energy Lab</h3>
-Level: <span id="energyLvl">1</span><br>
-<button class="factoryBtn" onclick="buyFactory('energy')">
-Upgrade
-</button>
+<h3>Energy Lab</h3>
+Level: <span id="energyLvl">1</span>
+<button onclick="buyFactory('energy')">Upgrade</button>
+<p>Cost: <span id="energyCost">10000</span></p>
 </div>
 
 </div>
@@ -156,11 +135,12 @@ Upgrade
 <!-- LEADERBOARD -->
 <div id="leaderboard" class="page">
 <div class="card">
-<h2>🏆 Top Players</h2>
+<h2>🏆 Leaderboard</h2>
 <div id="board">Loading...</div>
 </div>
 </div>
 
+<!-- MENU -->
 <div class="bottomMenu">
 <button onclick="showPage('home')">🏠</button>
 <button onclick="showPage('shop')">🏭</button>
@@ -169,9 +149,8 @@ Upgrade
 </div>
 
 <script>
-
-    // ================= FIREBASE =================
-
+    
+// FIREBASE CONFIG (вставиш свій)
 const firebaseConfig = {
   apiKey: "AIzaSyDHs8hHW4y-QCGx1ncYy-SOwPTfmuHtjB8",
   authDomain: "limeempire-ca8d4.firebaseapp.com",
@@ -184,242 +163,163 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ================= USER =================
-
+// USER
 let user = localStorage.getItem("uid");
-
 if(!user){
-    user = "U" + Math.floor(Math.random()*999999);
-    localStorage.setItem("uid", user);
+  user = "U"+Math.floor(Math.random()*999999);
+  localStorage.setItem("uid",user);
 }
 
-// ================= GAME =================
-
+// GAME DATA
 let coins = 0;
 let energy = 100;
 let power = 1;
 
 let factories = {
-    rubber:1,
-    juice:1,
-    lime:1,
-    water:1,
-    energyLab:1
+  rubber:1,
+  juice:1,
+  lime:1,
+  water:1,
+  energy:1
 };
 
-// ================= REF LINK =================
-
-document.getElementById("refLink").innerText =
-window.location.origin + "/?ref=" + user;
-
-// ================= PAGES =================
-
-function showPage(page){
-
-    document.querySelectorAll(".page").forEach(p=>{
-        p.classList.remove("active");
-    });
-
-    document.getElementById(page).classList.add("active");
-}
-
-// ================= TAP =================
-
+// TAP
 function tap(){
-
-    if(energy <= 0) return;
-
-    coins += power;
-    energy--;
-
-    update();
-    save();
+  if(energy<=0) return;
+  coins += power;
+  energy--;
+  update();
+  save();
 }
 
-// ================= UPGRADE TAP =================
-
+// UPGRADE TAP
 function upgradeTap(){
-
-    let cost = power * 50;
-
-    if(coins >= cost){
-
-        coins -= cost;
-        power++;
-
-        update();
-        save();
-    }
-}
-
-// ================= FACTORIES =================
-
-function buyFactory(type){
-
-    let lvl = factories[type];
-    let cost = lvl * 10000;
-
-    if(coins >= cost){
-
-        coins -= cost;
-
-        factories[type]++;
-
-        update();
-        save();
-    }
-}
-
-// ================= PASSIVE INCOME =================
-
-setInterval(()=>{
-
-    let income =
-        factories.rubber * 2 +
-        factories.juice * 5 +
-        factories.lime * 10 +
-        factories.water * 20 +
-        factories.energyLab * 50;
-
-    coins += income;
-
+  let cost = power*50;
+  if(coins>=cost){
+    coins-=cost;
+    power++;
     update();
     save();
+  }
+}
 
+// BUY FACTORY
+function buyFactory(type){
+  let cost = factories[type]*10000;
+  if(coins>=cost){
+    coins-=cost;
+    factories[type]++;
+    update();
+    save();
+  }
+}
+
+// PASSIVE INCOME
+setInterval(()=>{
+  let income =
+    factories.rubber*2 +
+    factories.juice*5 +
+    factories.lime*10 +
+    factories.water*20 +
+    factories.energy*40;
+
+  coins += income;
+  update();
+  save();
 },1000);
 
-// ================= ENERGY REGEN =================
-
+// ENERGY REGEN
 setInterval(()=>{
-
-    if(energy < 100){
-        energy++;
-        update();
-    }
-
+  if(energy<100) energy++;
+  update();
 },3000);
 
-// ================= UPDATE UI =================
-
+// UPDATE UI
 function update(){
 
-    document.getElementById("coins").innerText =
-        Math.floor(coins);
+  document.getElementById("coins").innerText = coins;
+  document.getElementById("energy").innerText = energy;
+  document.getElementById("power").innerText = power;
 
-    document.getElementById("energy").innerText =
-        energy;
+  document.getElementById("income").innerText =
+    factories.rubber*2 +
+    factories.juice*5 +
+    factories.lime*10 +
+    factories.water*20 +
+    factories.energy*40;
 
-    document.getElementById("power").innerText =
-        power;
+  document.getElementById("rubberLvl").innerText = factories.rubber;
+  document.getElementById("juiceLvl").innerText = factories.juice;
+  document.getElementById("limeLvl").innerText = factories.lime;
+  document.getElementById("waterLvl").innerText = factories.water;
+  document.getElementById("energyLvl").innerText = factories.energy;
 
-    document.getElementById("income").innerText =
-        (
-            factories.rubber*2 +
-            factories.juice*5 +
-            factories.lime*10 +
-            factories.water*20 +
-            factories.energyLab*50
-        ) * 3600;
+  document.getElementById("rubberCost").innerText = factories.rubber*10000;
+  document.getElementById("juiceCost").innerText = factories.juice*10000;
+  document.getElementById("limeCost").innerText = factories.lime*10000;
+  document.getElementById("waterCost").innerText = factories.water*10000;
+  document.getElementById("energyCost").innerText = factories.energy*10000;
 
-    document.getElementById("rubberLvl").innerText =
-        factories.rubber;
-
-    document.getElementById("juiceLvl").innerText =
-        factories.juice;
-
-    document.getElementById("limeLvl").innerText =
-        factories.lime;
-
-    document.getElementById("waterLvl").innerText =
-        factories.water;
-
-    document.getElementById("energyLvl").innerText =
-        factories.energyLab;
+  document.getElementById("refLink").innerText =
+    window.location.href + "?ref=" + user;
 }
 
-// ================= SAVE =================
-
+// SAVE
 function save(){
-
-    db.collection("players")
-    .doc(user)
-    .set({
-        coins,
-        energy,
-        power,
-        factories
-    });
+  db.collection("players").doc(user).set({
+    coins,
+    energy,
+    power,
+    factories
+  });
 }
 
-// ================= LOAD =================
-
+// LOAD
 async function load(){
-
-    const doc =
-    await db.collection("players")
-    .doc(user)
-    .get();
-
-    if(doc.exists){
-
-        const data = doc.data();
-
-        coins = data.coins || 0;
-        energy = data.energy || 100;
-        power = data.power || 1;
-
-        if(data.factories){
-            factories = data.factories;
-        }
-    }
-
-    update();
+  let doc = await db.collection("players").doc(user).get();
+  if(doc.exists){
+    let d = doc.data();
+    coins = d.coins||0;
+    energy = d.energy||100;
+    power = d.power||1;
+    factories = d.factories||factories;
+  }
+  update();
 }
 
-// ================= LEADERBOARD =================
-
+// LEADERBOARD
 async function leaderboard(){
-
-    const snap =
-    await db.collection("players")
+  let snap = await db.collection("players")
     .orderBy("coins","desc")
     .limit(10)
     .get();
 
-    let html = "";
+  let html="";
+  let i=1;
 
-    let pos = 1;
+  snap.forEach(doc=>{
+    html+=`${i}. ${doc.id} - ${doc.data().coins}<br>`;
+    i++;
+  });
 
-    snap.forEach(doc=>{
-
-        const data = doc.data();
-
-        html += `
-        <div>
-        ${pos}. ${doc.id}
-        — 💰 ${Math.floor(data.coins || 0)}
-        </div>
-        `;
-
-        pos++;
-    });
-
-    document.getElementById("board").innerHTML =
-    html;
+  document.getElementById("board").innerHTML = html;
 }
 
-// ================= AUTO LB =================
+// NAV
+function showPage(p){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById(p).classList.add("active");
+}
 
-setInterval(()=>{
-    leaderboard();
-},5000);
+// LOOP
+setInterval(leaderboard,5000);
 
-// ================= START =================
-
+// START
 load();
 leaderboard();
 update();
 
 </script>
+
 </body>
 </html>
