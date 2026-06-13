@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire</title>
+<title>Lime Empire Menu</title>
 
 <style>
 body {
@@ -12,24 +12,18 @@ body {
     text-align: center;
 }
 
-h1 { margin-top: 10px; }
+/* TOP */
+h1 {
+    margin: 10px;
+}
 
+/* BALANCE */
 #balance {
-    font-size: 40px;
+    font-size: 35px;
     font-weight: bold;
 }
 
-#level {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.center {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
+/* LIME */
 #lime {
     width: 180px;
     cursor: pointer;
@@ -40,10 +34,40 @@ h1 { margin-top: 10px; }
     transform: scale(0.9);
 }
 
-.shop {
-    margin-top: 20px;
+/* SECTIONS */
+.page {
+    display: none;
+    padding: 10px;
 }
 
+.active {
+    display: block;
+}
+
+/* BOTTOM MENU */
+.nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    background: #fff;
+    border-top: 2px solid #ddd;
+}
+
+.nav button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.nav button:hover {
+    background: #f5f5f5;
+}
+
+/* CARD */
 .card {
     background: white;
     width: 280px;
@@ -53,14 +77,13 @@ h1 { margin-top: 10px; }
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
 }
 
-button {
+button.action {
     width: 100%;
     padding: 10px;
     border: none;
-    border-radius: 8px;
     background: #ffcc00;
+    border-radius: 8px;
     font-weight: bold;
-    cursor: pointer;
 }
 </style>
 </head>
@@ -68,123 +91,102 @@ button {
 <body>
 
 <h1>🍋 Lime Empire</h1>
-
 <div id="balance">0</div>
-<div id="level">Level: 1</div>
 
-<div class="center">
+<!-- HOME -->
+<div id="home" class="page active">
     <img id="lime"
-    src="https://i.imgur.com/8Qf6Y6U.png"
+    src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Lime-Whole-Split.jpg"
     onclick="clickLime()">
 </div>
 
-<div class="shop">
+<!-- SHOP -->
+<div id="shop" class="page">
 
     <div class="card">
         <h3>⚡ Power</h3>
-        <button onclick="buyPower()">Buy (10)</button>
+        <button class="action" onclick="buyPower()">Buy (10)</button>
     </div>
 
     <div class="card">
-        <h3>🏭 Factory 1</h3>
-        <button onclick="buyFactory('lemon')">Buy (20)</button>
+        <h3>🏭 Factory</h3>
+        <button class="action" onclick="buyFactory()">Buy (20)</button>
     </div>
 
-    <div class="card">
-        <h3>🏭 Factory 2</h3>
-        <button onclick="buyFactory('juice')">Buy (100)</button>
-    </div>
+</div>
 
-    <div class="card">
-        <h3>🏭 Factory 3</h3>
-        <button onclick="buyFactory('mega')">Buy (400)</button>
-    </div>
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="page">
+    <h2>🏆 Leaderboard</h2>
+    <p>Coming soon...</p>
+</div>
 
+<!-- REFERRAL -->
+<div id="ref" class="page">
+    <h2>👥 Referral System</h2>
+    <p>Invite friends and earn rewards!</p>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+    <button onclick="openPage('home')">Home</button>
+    <button onclick="openPage('shop')">Shop</button>
+    <button onclick="openPage('leaderboard')">Rank</button>
+    <button onclick="openPage('ref')">Ref</button>
 </div>
 
 <script>
 
-// ===== DATA =====
+// DATA
 let coins = Number(localStorage.getItem("coins")) || 0;
 let power = Number(localStorage.getItem("power")) || 1;
+let factories = Number(localStorage.getItem("factories")) || 0;
 
-let factories = {
-    lemon: Number(localStorage.getItem("lemon")) || 0,
-    juice: Number(localStorage.getItem("juice")) || 0,
-    mega: Number(localStorage.getItem("mega")) || 0
-};
+// UPDATE
+function update() {
+    document.getElementById("balance").innerText = coins;
+}
 
-let level = Number(localStorage.getItem("level")) || 1;
-
-// ===== SAVE =====
+// SAVE
 function save() {
     localStorage.setItem("coins", coins);
     localStorage.setItem("power", power);
-    localStorage.setItem("lemon", factories.lemon);
-    localStorage.setItem("juice", factories.juice);
-    localStorage.setItem("mega", factories.mega);
-    localStorage.setItem("level", level);
+    localStorage.setItem("factories", factories);
 }
 
-// ===== UPDATE =====
-function update() {
-    document.getElementById("balance").innerText = coins;
-    document.getElementById("level").innerText = "Level: " + level;
-}
-
-// ===== CLICK =====
+// CLICK
 function clickLime() {
     coins += power;
     save();
     update();
-    checkLevel();
 }
 
-// ===== POWER =====
+// SHOP
 function buyPower() {
     if (coins >= 10) {
         coins -= 10;
-        power += 1;
+        power++;
         save();
         update();
     }
 }
 
-// ===== FACTORIES =====
-function buyFactory(type) {
-    if (type === 'lemon' && coins >= 20) {
+function buyFactory() {
+    if (coins >= 20) {
         coins -= 20;
-        factories.lemon++;
+        factories++;
+        save();
+        update();
     }
-    if (type === 'juice' && coins >= 100) {
-        coins -= 100;
-        factories.juice++;
-    }
-    if (type === 'mega' && coins >= 400) {
-        coins -= 400;
-        factories.mega++;
-    }
-    save();
-    update();
 }
 
-// ===== INCOME =====
-setInterval(() => {
-    coins += factories.lemon * 1;
-    coins += factories.juice * 5;
-    coins += factories.mega * 20;
-
-    save();
-    update();
-    checkLevel();
-}, 1000);
-
-// ===== LEVEL =====
-function checkLevel() {
-    level = Math.floor(Math.pow(coins / 100, 0.6)) + 1;
+// NAVIGATION
+function openPage(page) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
 }
 
-// ===== START =====
+// START
 update();
 
 </script>
