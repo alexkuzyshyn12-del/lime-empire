@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lime Empire Full</title>
+<title>Lime Empire</title>
 
 <style>
 body{
@@ -13,9 +13,7 @@ body{
 }
 
 h1{margin:10px;}
-
 #coins{font-size:40px;font-weight:bold;}
-#energy{color:green;}
 
 .card{
     background:white;
@@ -35,16 +33,16 @@ button{
     border-radius:8px;
 }
 
+.page{display:none;}
+.active{display:block;}
+
 .nav{
     position:fixed;
     bottom:0;
     width:100%;
     display:flex;
 }
-
 .nav button{flex:1;}
-.page{display:none;}
-.active{display:block;}
 </style>
 </head>
 
@@ -55,7 +53,6 @@ button{
 <div class="card">
 <div id="coins">0</div>
 <div>⚡ Energy: <span id="energy">100</span></div>
-<div>🖱 Tap Power: <span id="power">1</span></div>
 </div>
 
 <!-- HOME -->
@@ -65,40 +62,13 @@ button{
 
 <!-- SHOP -->
 <div id="shop" class="page">
-
-<div class="card">
-<h3>🖱 Upgrade Tap</h3>
-<button onclick="upgradeTap()">Upgrade</button>
-</div>
-
-<div class="card">
-<h3>🏭 Rubber Factory</h3>
-<button onclick="buy('rubber')">Buy</button>
-<p>Lvl: <span id="r1"></span></p>
-</div>
-
-<div class="card">
-<h3>🍹 Juice Factory</h3>
-<button onclick="buy('juice')">Buy</button>
-<p>Lvl: <span id="r2"></span></p>
-</div>
-
+<button onclick="upgradeTap()">Upgrade Tap</button>
+<button onclick="buyFactory()">Buy Factory</button>
 </div>
 
 <!-- REF -->
 <div id="ref" class="page">
-<div class="card">
-<h3>👥 Referral</h3>
 <p id="refcode"></p>
-</div>
-</div>
-
-<!-- LB -->
-<div id="lb" class="page">
-<div class="card">
-<h3>🏆 Leaderboard</h3>
-<div id="board"></div>
-</div>
 </div>
 
 <!-- NAV -->
@@ -106,41 +76,59 @@ button{
 <button onclick="openPage('home')">Home</button>
 <button onclick="openPage('shop')">Shop</button>
 <button onclick="openPage('ref')">Ref</button>
-<button onclick="openPage('lb')">Rank</button>
 </div>
 
+<!-- =============================== -->
+<!-- 🔥 FIREBASE CONFIG PLACE BELOW -->
+<!-- =============================== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 <script>
+
+/* ======================================================
+   🔥 ВСТАВ СЮДИ FIREBASE CONFIG (ТОВІ ДАНІ З CONSOLE)
+====================================================== */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDHs8hHW4y-QCGx1ncYy-SOwPTfmuHtjB8",
+  authDomain: "limeempire-ca8d4.firebaseapp.com",
+  projectId: "limeempire-ca8d4",
+  storageBucket: "limeempire-ca8d4.firebasestorage.app",
+  messagingSenderId: "86132052870",
+  appId: "1:86132052870:web:e94cee824f08a191c81207",
+  measurementId: "G-KERY2X6D68"
+};
+
+/* ======================================================
+   НЕ ТРОГАЙ НИЖЧЕ (поки не вставиш config)
+====================================================== */
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ===== USER =====
+let userId = localStorage.getItem("uid");
+if(!userId){
+    userId = "U"+Math.floor(Math.random()*999999);
+    localStorage.setItem("uid",userId);
+}
 
 // ===== DATA =====
 let coins = 0;
 let power = 1;
+let factories = 0;
 let energy = 100;
-
-// factories
-let f = {
-    rubber:{c:0,lvl:1,base:60},
-    juice:{c:0,lvl:1,base:200}
-};
-
-// user
-let user = localStorage.getItem("uid");
-if(!user){
-    user = "U"+Math.floor(Math.random()*999999);
-    localStorage.setItem("uid",user);
-}
 
 // ===== TAP =====
 function tap(){
 if(energy<=0) return;
-
 coins += power;
-energy -= 1;
-
+energy--;
 save();
 update();
 }
 
-// ===== TAP UPGRADE =====
+// ===== UPGRADE TAP =====
 function upgradeTap(){
 if(coins >= 50*power){
     coins -= 50*power;
@@ -151,12 +139,10 @@ if(coins >= 50*power){
 }
 
 // ===== BUY FACTORY =====
-function buy(t){
-let cost = 10000 * f[t].lvl;
-
-if(coins >= cost){
-    coins -= cost;
-    f[t].lvl++;
+function buyFactory(){
+if(coins >= 10000){
+    coins -= 10000;
+    factories++;
     save();
     update();
 }
@@ -164,67 +150,51 @@ if(coins >= cost){
 
 // ===== ENERGY =====
 setInterval(()=>{
-if(energy < 100) energy++;
+if(energy<100) energy++;
 update();
 },1000);
 
 // ===== INCOME =====
 setInterval(()=>{
-coins += f.rubber.c * f.rubber.base * f.rubber.lvl;
-coins += f.juice.c * f.juice.base * f.juice.lvl;
+coins += factories * 50;
 save();
 update();
 },1000);
 
-// ===== SAVE (LOCAL) =====
+// ===== SAVE ONLINE =====
 function save(){
-localStorage.setItem("game",JSON.stringify({
-coins,power,energy,f
-}));
+db.collection("players").doc(userId).set({
+    coins: coins,
+    power: power,
+    factories: factories
+});
 }
 
-// ===== LOAD =====
-function load(){
-let g = JSON.parse(localStorage.getItem("game"));
-if(g){
-coins=g.coins;
-power=g.power;
-energy=g.energy;
-f=g.f;
+// ===== LOAD ONLINE =====
+async function load(){
+let doc = await db.collection("players").doc(userId).get();
+
+if(doc.exists){
+    let d = doc.data();
+    coins = d.coins;
+    power = d.power;
+    factories = d.factories;
 }
 update();
-}
-
-// ===== REF =====
-function ref(){
-document.getElementById("refcode").innerText =
-"https://t.me/YOUR_BOT?start="+user;
-}
-
-// ===== LB =====
-function board(){
-document.getElementById("board").innerHTML=
-"<p>Online leaderboard needs Firebase</p>";
 }
 
 // ===== UI =====
 function update(){
 document.getElementById("coins").innerText = coins;
 document.getElementById("energy").innerText = energy;
-document.getElementById("power").innerText = power;
-
-document.getElementById("r1").innerText = f.rubber.lvl;
-document.getElementById("r2").innerText = f.juice.lvl;
-
-ref();
+document.getElementById("refcode").innerText =
+"https://t.me/YOUR_BOT?start="+userId;
 }
 
 // ===== NAV =====
 function openPage(p){
 document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
 document.getElementById(p).classList.add("active");
-
-if(p=="lb") board();
 }
 
 // START
