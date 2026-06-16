@@ -335,17 +335,18 @@ Loading...
 
 // ================= SUPABASE =================
 
-const SUPABASE_URL =
-"https://gwcxpigmaxileazziyor.supabase.co";
+const SUPABASE_URL = "https://gwcxpigmaxileazziyor.supabase.co";
+const SUPABASE_KEY = "твій_ключ";
 
-const SUPABASE_KEY =
-"sb_publishable_y6RFhlABXanoCRcCemI_EQ_s_r8Us3w";
+let supabase;
 
-const supabase =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+window.addEventListener("load", () => {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  load();
+  leaderboard();
+  update();
+});
 
 // ================= USER =================
 
