@@ -1,7 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,15 +11,20 @@
 
 <style>
 
-body{
+*{
 margin:0;
-font-family:Arial,sans-serif;
-background:#f7e37b;
-text-align:center;
-padding-bottom:80px;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
 }
 
-.top{
+body{
+background:#f5e46d;
+text-align:center;
+padding-bottom:90px;
+}
+
+.header{
 background:white;
 margin:10px;
 padding:15px;
@@ -37,47 +42,72 @@ border-radius:15px;
 display:none;
 }
 
-.active{
+.page.active{
 display:block;
 }
 
 #tapBtn{
-width:280px;
-height:280px;
+
+width:300px;
+height:300px;
+
 border:none;
 border-radius:50%;
+
+font-size:140px;
+
 background:#ffd54f;
-font-size:120px;
-box-shadow:0 0 25px rgba(0,0,0,.25);
+
+box-shadow:0 0 30px rgba(0,0,0,.25);
+
 }
 
 .buyBtn{
+
 width:90%;
-padding:10px;
+padding:12px;
 margin-top:10px;
+
+border:none;
+border-radius:10px;
+
+font-size:16px;
+
 }
 
-.bottomMenu{
+.menu{
+
 position:fixed;
 bottom:0;
+left:0;
+
 width:100%;
+
 display:flex;
+
 background:white;
+
 }
 
-.bottomMenu button{
+.menu button{
+
 flex:1;
+
 padding:15px;
-font-size:18px;
+
 border:none;
+
+font-size:18px;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="top">
+<div class="header">
 
 <h1>🍋 Lime Empire</h1>
 
@@ -112,6 +142,8 @@ border:none;
 
 <div id="home" class="page active">
 
+<br>
+
 <button id="tapBtn"
 onclick="tap()">
 🍋
@@ -127,8 +159,7 @@ onclick="tap()">
 
 <h3>🖱 Upgrade Tap</h3>
 
-<p>
-Cost:
+<p>Cost:
 <span id="tapCost">50</span>
 </p>
 
@@ -141,7 +172,7 @@ Upgrade
 
 <div class="card">
 
-<h3>⚡ Upgrade Energy</h3>
+<h3>⚡ Energy Upgrade</h3>
 
 <p>
 Level:
@@ -160,19 +191,20 @@ Upgrade
 
 </div>
 
+```html
+<!-- FACTORIES -->
+
 <div class="card">
 
 <h3>🏭 Rubber Factory</h3>
 
-<p>Required Level: 1</p>
+<p>Unlock Level: 1</p>
 
-<p>
-Factory Level:
+<p>Level:
 <span id="rubberLvl">0</span>
 </p>
 
-<p>
-Cost:
+<p>Cost:
 <span id="rubberCost">10000</span>
 </p>
 
@@ -187,15 +219,13 @@ Upgrade
 
 <h3>🍹 Juice Factory</h3>
 
-<p>Required Level: 10</p>
+<p>Unlock Level: 10</p>
 
-<p>
-Factory Level:
+<p>Level:
 <span id="juiceLvl">0</span>
 </p>
 
-<p>
-Cost:
+<p>Cost:
 <span id="juiceCost">25000</span>
 </p>
 
@@ -210,19 +240,16 @@ Upgrade
 
 <h3>🍋 Lime Farm</h3>
 
-<p>Required Level: 20</p>
+<p>Unlock Level: 20</p>
 
-<p>
-Factory Level:
+<p>Level:
 <span id="limeLvl">0</span>
 </p>
 
-<p>
-Cost:
+<p>Cost:
 <span id="limeCost">50000</span>
 </p>
 
-<p>
 <button class="buyBtn"
 onclick="buyFactory('lime')">
 Upgrade
@@ -234,15 +261,13 @@ Upgrade
 
 <h3>💧 Water Plant</h3>
 
-<p>Required Level: 35</p>
+<p>Unlock Level: 35</p>
 
-<p>
-Factory Level:
+<p>Level:
 <span id="waterLvl">0</span>
 </p>
 
-<p>
-Cost:
+<p>Cost:
 <span id="waterCost">100000</span>
 </p>
 
@@ -257,15 +282,13 @@ Upgrade
 
 <h3>⚡ Energy Lab</h3>
 
-<p>Required Level: 50</p>
+<p>Unlock Level: 50</p>
 
-<p>
-Factory Level:
+<p>Level:
 <span id="energyLvl">0</span>
 </p>
 
-<p>
-Cost:
+<p>Cost:
 <span id="energyCost">250000</span>
 </p>
 
@@ -278,13 +301,68 @@ Upgrade
 
 </div>
 
-<!-- FRIENDS -->
+<!-- TASKS -->
+
+<div id="tasks" class="page">
+
+<div class="card">
+
+<h2>📢 Join Channel</h2>
+
+<p>Reward: 5000 coins</p>
+
+<button class="buyBtn"
+onclick="window.open('https://t.me/YOUR_CHANNEL')">
+Open Channel
+</button>
+
+<button class="buyBtn"
+onclick="claimTask('channel',5000)">
+Claim Reward
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>💬 Join Chat</h2>
+
+<p>Reward: 10000 coins</p>
+
+<button class="buyBtn"
+onclick="window.open('https://t.me/YOUR_CHAT')">
+Open Chat
+</button>
+
+<button class="buyBtn"
+onclick="claimTask('chat',10000)">
+Claim Reward
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>👥 Invite Friend</h2>
+
+<p>Reward: 15000 coins</p>
+
+<button class="buyBtn"
+onclick="claimTask('friend',15000)">
+Claim Reward
+</button>
+
+</div>
+
+</div>
+
+<!-- REFERRALS -->
 
 <div id="friends" class="page">
 
 <div class="card">
 
-<h2>👥 Referral</h2>
+<h2>👥 Referral System</h2>
 
 <p id="refLink">
 Loading...
@@ -303,14 +381,18 @@ Loading...
 <h2>🏆 Leaderboard</h2>
 
 <div id="board">
+
 Loading...
-</div>
 
 </div>
 
 </div>
 
-<div class="bottomMenu">
+</div>
+
+<!-- MENU -->
+
+<div class="menu">
 
 <button onclick="showPage('home')">
 🏠
@@ -318,6 +400,10 @@ Loading...
 
 <button onclick="showPage('shop')">
 🏭
+</button>
+
+<button onclick="showPage('tasks')">
+🎯
 </button>
 
 <button onclick="showPage('friends')">
@@ -335,18 +421,17 @@ Loading...
 
 // ================= SUPABASE =================
 
-const SUPABASE_URL = "https://gwcxpigmaxileazziyor.supabase.co";
-const SUPABASE_KEY = "твій_ключ";
+const SUPABASE_URL =
+"https://gwcxpigmaxileazziyor.supabase.co";
 
-let supabase;
+const SUPABASE_KEY =
+"sb_publishable_y6RFhlABXanoCRcCemI_EQ_s_r8Us3w";
 
-window.addEventListener("load", () => {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  load();
-  leaderboard();
-  update();
-});
+const supabase =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 // ================= USER =================
 
@@ -357,7 +442,9 @@ if(!user){
 
 user =
 "U" +
-Math.floor(Math.random()*999999999);
+Math.floor(
+Math.random()*999999999
+);
 
 localStorage.setItem(
 "uid",
@@ -369,7 +456,6 @@ user
 // ================= PLAYER =================
 
 let coins = 0;
-
 let totalCoinsEarned = 0;
 
 let level = 1;
@@ -377,7 +463,6 @@ let level = 1;
 let power = 1;
 
 let energy = 100;
-
 let maxEnergy = 100;
 
 let energyUpgradeLvl = 1;
@@ -439,60 +524,16 @@ document
 
 }
 
-// ================= LEVELS =================
+// ================= LEVEL =================
 
 function checkLevel(){
 
-if(totalCoinsEarned >= 1000000000)
-level = 100;
-
-else if(totalCoinsEarned >= 500000000)
-level = 90;
-
-else if(totalCoinsEarned >= 250000000)
-level = 80;
-
-else if(totalCoinsEarned >= 100000000)
-level = 70;
-
-else if(totalCoinsEarned >= 50000000)
-level = 60;
-
-else if(totalCoinsEarned >= 25000000)
-level = 50;
-
-else if(totalCoinsEarned >= 10000000)
-level = 40;
-
-else if(totalCoinsEarned >= 5000000)
-level = 35;
-
-else if(totalCoinsEarned >= 1000000)
-level = 30;
-
-else if(totalCoinsEarned >= 500000)
-level = 25;
-
-else if(totalCoinsEarned >= 100000)
-level = 20;
-
-else if(totalCoinsEarned >= 50000)
-level = 15;
-
-else if(totalCoinsEarned >= 10000)
-level = 10;
-
-else if(totalCoinsEarned >= 5000)
-level = 8;
-
-else if(totalCoinsEarned >= 1000)
-level = 5;
-
-else if(totalCoinsEarned >= 100)
-level = 2;
-
-else
-level = 1;
+level =
+Math.floor(
+Math.sqrt(
+totalCoinsEarned / 1000
+)
+) + 1;
 
 }
 
@@ -515,7 +556,7 @@ save();
 
 }
 
-// ================= TAP UPGRADE =================
+// ================= UPGRADES =================
 
 function upgradeTap(){
 
@@ -535,8 +576,6 @@ save();
 }
 
 }
-
-// ================= ENERGY UPGRADE =================
 
 function upgradeEnergy(){
 
@@ -559,7 +598,7 @@ save();
 
 }
 
-// ================= FACTORY BUY =================
+// ================= FACTORIES =================
 
 function buyFactory(type){
 
@@ -599,7 +638,36 @@ save();
 
 }
 
-// ================= PASSIVE INCOME =================
+// ================= TASKS =================
+
+function claimTask(
+task,
+reward
+){
+
+if(
+localStorage.getItem(
+"task_"+task
+)
+)
+return;
+
+coins += reward;
+
+totalCoinsEarned += reward;
+
+localStorage.setItem(
+"task_"+task,
+"done"
+);
+
+update();
+
+save();
+
+}
+
+// ================= PASSIVE =================
 
 setInterval(()=>{
 
@@ -628,7 +696,7 @@ update();
 
 },1000);
 
-// ================= ENERGY REGEN =================
+// ================= ENERGY =================
 
 setInterval(()=>{
 
@@ -645,67 +713,6 @@ update();
 
 },3000);
 
-
-// ================= UPDATE UI =================
-
-function update(){
-
-checkLevel();
-
-document.getElementById("coins").innerText =
-Math.floor(coins);
-
-document.getElementById("level").innerText =
-level;
-
-document.getElementById("energy").innerText =
-energy;
-
-document.getElementById("maxEnergy").innerText =
-maxEnergy;
-
-document.getElementById("power").innerText =
-power;
-
-document.getElementById("income").innerText =
-(
-factories.rubber.level * factories.rubber.income +
-factories.juice.level * factories.juice.income +
-factories.lime.level * factories.lime.income +
-factories.water.level * factories.water.income +
-factories.energy.level * factories.energy.income
-) * 3600;
-
-document.getElementById("tapCost").innerText =
-power * 50;
-
-document.getElementById("energyUpgradeLvl").innerText =
-energyUpgradeLvl;
-
-document.getElementById("energyUpgradeCost").innerText =
-energyUpgradeLvl * 500;
-
-// factories UI
-
-for(let key in factories){
-
-let f = factories[key];
-
-document.getElementById(key+"Lvl").innerText =
-f.level;
-
-document.getElementById(key+"Cost").innerText =
-f.cost;
-
-}
-
-// referral link
-
-document.getElementById("refLink").innerText =
-window.location.href + "?ref=" + user;
-
-}
-
 // ================= SAVE =================
 
 async function save(){
@@ -717,12 +724,22 @@ await supabase
 id:user,
 
 coins,
-total_coins:totalCoinsEarned,
+
+total_coins:
+totalCoinsEarned,
+
 level,
+
 power,
+
 energy,
-max_energy:maxEnergy,
-energy_upgrade_lvl:energyUpgradeLvl,
+
+max_energy:
+maxEnergy,
+
+energy_upgrade_lvl:
+energyUpgradeLvl,
+
 factories
 
 });
@@ -733,7 +750,8 @@ factories
 
 async function load(){
 
-let { data } = await supabase
+const { data } =
+await supabase
 .from("players")
 .select("*")
 .eq("id", user)
@@ -741,24 +759,30 @@ let { data } = await supabase
 
 if(data){
 
-coins = data.coins || 0;
+coins =
+data.coins || 0;
 
 totalCoinsEarned =
 data.total_coins || 0;
 
-level = data.level || 1;
+level =
+data.level || 1;
 
-power = data.power || 1;
+power =
+data.power || 1;
 
-energy = data.energy || 100;
+energy =
+data.energy || 100;
 
-maxEnergy = data.max_energy || 100;
+maxEnergy =
+data.max_energy || 100;
 
 energyUpgradeLvl =
 data.energy_upgrade_lvl || 1;
 
 if(data.factories)
-factories = data.factories;
+factories =
+data.factories;
 
 }
 
@@ -770,48 +794,157 @@ update();
 
 async function leaderboard(){
 
-let { data } = await supabase
+const { data } =
+await supabase
 .from("players")
 .select("*")
-.order("total_coins",
-{ascending:false})
+.order(
+"total_coins",
+{
+ascending:false
+}
+)
 .limit(10);
 
 let html = "";
 
-data.forEach((p,i)=>{
+if(data){
+
+data.forEach(
+(player,index)=>{
 
 html += `
 <p>
-#${i+1}
-${p.id}
+#${index+1}
+${player.id}
 —
-💰 ${Math.floor(p.total_coins || 0)}
+💰 ${Math.floor(
+player.total_coins || 0
+)}
 </p>
 `;
 
 });
 
-document.getElementById("board").innerHTML =
+}
+
+document
+.getElementById("board")
+.innerHTML =
 html;
 
 }
 
-// ================= AUTO LOOP =================
+// ================= UPDATE =================
 
-setInterval(()=>{
+function update(){
 
-leaderboard();
+checkLevel();
 
-},5000);
+document
+.getElementById("coins")
+.innerText =
+Math.floor(coins);
+
+document
+.getElementById("level")
+.innerText =
+level;
+
+document
+.getElementById("energy")
+.innerText =
+energy;
+
+document
+.getElementById("maxEnergy")
+.innerText =
+maxEnergy;
+
+document
+.getElementById("power")
+.innerText =
+power;
+
+document
+.getElementById("tapCost")
+.innerText =
+power * 50;
+
+document
+.getElementById("energyUpgradeLvl")
+.innerText =
+energyUpgradeLvl;
+
+document
+.getElementById("energyUpgradeCost")
+.innerText =
+energyUpgradeLvl * 500;
+
+for(let key in factories){
+
+document
+.getElementById(
+key+"Lvl"
+)
+.innerText =
+factories[key].level;
+
+document
+.getElementById(
+key+"Cost"
+)
+.innerText =
+factories[key].cost;
+
+}
+
+let income =
+
+factories.rubber.level *
+factories.rubber.income +
+
+factories.juice.level *
+factories.juice.income +
+
+factories.lime.level *
+factories.lime.income +
+
+factories.water.level *
+factories.water.income +
+
+factories.energy.level *
+factories.energy.income;
+
+document
+.getElementById("income")
+.innerText =
+income * 3600;
+
+document
+.getElementById("refLink")
+.innerText =
+window.location.href +
+"?ref=" +
+user;
+
+}
 
 // ================= START =================
 
 load();
+
 leaderboard();
+
+setInterval(
+leaderboard,
+5000
+);
+
 update();
 
 </script>
 
 </body>
 </html>
+
